@@ -1,11 +1,15 @@
 package com.jsp.Employee_management.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import com.jsp.Employee_management.Entity.EmployeeDetails;
 import com.jsp.Employee_management.dao.EmployeeDao;
+import com.jsp.Employee_management.exception.IdNotFound;
+import com.jsp.Employee_management.util.ResponseStructure;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.InternetAddress;
@@ -50,7 +54,27 @@ public class EmployeeService {
 
 	    mailsender.send(message);
 	}
-	
-	
 
+
+//	public EmployeeDetails fetchEmployeeDetails(int id) {
+//		// TODO Auto-generated method stub
+//		return dao.fetchEmployeeDetails(id);
+//	}
+	public ResponseEntity<ResponseStructure<EmployeeDetails>> fetchEmployeeDetails(int id){
+		
+		EmployeeDetails db = dao.fetchEmployeeDetails(id);
+		if(db!=null) {
+		ResponseStructure<EmployeeDetails> rs = new ResponseStructure<EmployeeDetails>();
+		rs.setStateCode(HttpStatus.CREATED.value());
+		System.out.println(dao.fetchEmployeeDetails(id));
+		rs.setData(dao.fetchEmployeeDetails(id));
+		rs.setMessage("id  found  Sucessfully..!");
+		return new ResponseEntity<ResponseStructure<EmployeeDetails>>(rs,HttpStatus.CREATED);
+		
+	}
+		else {
+			throw new IdNotFound();
+		}
+	}
+	
 }
