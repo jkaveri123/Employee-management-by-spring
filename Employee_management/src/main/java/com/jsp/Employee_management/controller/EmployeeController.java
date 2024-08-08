@@ -1,56 +1,92 @@
 package com.jsp.Employee_management.controller;
 
+import java.io.IOException;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.jsp.Employee_management.Entity.EmployeeDetails;
+import com.jsp.Employee_management.Entity.LoginRequest;
 import com.jsp.Employee_management.clone.EmployeeClone;
 import com.jsp.Employee_management.service.EmployeeService;
 import com.jsp.Employee_management.util.ResponseStructure;
 
 
+
 @RestController
+//@RequestMapping("/employees")
 public class EmployeeController {
-@Autowired
-EmployeeService service;
-@Autowired
-ModelMapper mapper;
-@PostMapping("/save")
+	@Autowired
+	EmployeeService service;
+	@Autowired
+	ModelMapper mapper;
 
+	@PostMapping("/save")
 
-public EmployeeClone register(@RequestBody EmployeeDetails e) {
-	 EmployeeDetails register = service.SaveEmployee(e);
-	try {
-		EmployeeClone ec=m1(register);
-		return ec;
-	}catch(Exception ex){
-		ex.printStackTrace();
+	public EmployeeClone register(@RequestBody EmployeeDetails e) {
+		EmployeeDetails register = service.SaveEmployee(e);
+		try {
+			EmployeeClone ec = m1(register);
+			return ec;
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return null;
+
 	}
-	return null;
-	
-}
-@PostMapping("/emp")
-private EmployeeClone m1(@RequestBody EmployeeDetails emp) {
-	EmployeeClone c=mapper.map(emp, EmployeeClone.class);
-	return c;
-}
-@PostMapping("/sendhtml")
-public String sendHtml(@RequestBody EmployeeDetails emp) {
-	try {
-		service.sendHtmlEmail(emp);
-		return "msg send successfully";
-	}catch(Exception e) {
-		return "internal error";
+
+	@PostMapping("/emp")
+	private EmployeeClone m1(@RequestBody EmployeeDetails emp) {
+		EmployeeClone c = mapper.map(emp, EmployeeClone.class);
+		return c;
 	}
-}
-@GetMapping("/find")
-public ResponseEntity<ResponseStructure<EmployeeDetails>> findById(@RequestParam int id){
-	return service.fetchEmployeeDetails(id);
-}
-}
+
+	@PostMapping("/sendhtml")
+	public String sendHtml(@RequestBody EmployeeDetails emp) {
+		try {
+			service.sendHtmlEmail(emp);
+			return "msg send successfully";
+		} catch (Exception e) {
+			return "internal error";
+		}
+	}
+
+	@GetMapping("/find")
+	public ResponseEntity<ResponseStructure<EmployeeDetails>> findById(@RequestParam int id) {
+		return service.fetchEmployeeDetails(id);
+	}
+
+	@DeleteMapping("/delete")
+	public ResponseEntity<ResponseStructure<EmployeeDetails>> delete(@RequestParam int id) {
+		return service.delete(id);
+	}
+	@PutMapping("/update")
+    public ResponseEntity<ResponseStructure<EmployeeDetails>> update(@RequestBody EmployeeDetails employeeDetails) {
+		return service.updateEmployee(employeeDetails);
+        
+    }
+	@GetMapping("/login")
+    public ResponseEntity<ResponseStructure<EmployeeDetails>> login(@RequestBody LoginRequest loginRequest) {
+        return service.loginEmployee(loginRequest);
+    }
+	 @PostMapping("/image")
+	 public ResponseEntity<ResponseStructure<EmployeeClone>> saveImage(@RequestParam int id, @RequestParam MultipartFile file)
+	   throws IOException {
+	  return service.saveImageById(id,file);
+	 }
+	 @GetMapping("/fetchImage")
+	 public ResponseEntity<byte[]> findById1(@RequestParam int id) {
+	  return service.fetchImage(id);
+	 }
+	}
+
